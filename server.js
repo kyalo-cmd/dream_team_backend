@@ -2,6 +2,7 @@ const express = require('express');
 const mysql = require('mysql2');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+require('dotenv').config(); // Load environment variables from .env file
 
 // Initialize Express app
 const app = express();
@@ -10,22 +11,21 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// MySQL connection
+// MySQL connection using environment variables
 const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '@Chris2022',  // Make sure this is the exact password
-  database: 'dream_team_contributions'
+  host: process.env.DB_HOST, // Database host
+  user: process.env.DB_USER, // Database username
+  password: process.env.DB_PASSWORD, // Database password
+  database: process.env.DB_NAME // Database name
 });
-
 
 // Connect to MySQL
 db.connect(err => {
   if (err) {
-    console.error('Error connecting to MySQL: ', err.stack);
+    console.error('Error connecting to MySQL: ', err.message);
     return;
   }
-  console.log('Connected to MySQL as id ' + db.threadId);
+  console.log('Connected to MySQL database');
 });
 
 // Endpoint to add a new contribution
@@ -54,42 +54,8 @@ app.get('/get-contributions', (req, res) => {
   });
 });
 
-// Start the server
+// Start the server using environment variable for PORT
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-async function addContribution() {
-  const name = document.getElementById('memberName').value.trim();
-  const amount = document.getElementById('amount').value.trim();
-  const month = document.getElementById('month').value;
-  const dateAdded = new Date().toLocaleDateString();
-
-  if (name && amount && month) {
-    try {
-      const response = await fetch('https://kyalo-cmd.github.io/dream_team_backend/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name, amount, month, dateAdded }),
-      });
-      const data = await response.text();
-      alert(data);
-      renderTable();  // Update the frontend after success
-    } catch (error) {
-      alert('Error adding contribution: ' + error.message);
-    }
-  } else {
-    alert('Please fill in all fields');
-  }
-}
-async function getContributions() {
-  try {
-    const response = await fetch('https://kyalo-cmd.github.io/dream_team_backend/');
-    const contributions = await response.json();
-    renderTable(contributions);  // Update the table with live data
-  } catch (error) {
-    alert('Error fetching contributions: ' + error.message);
-  }
-}
