@@ -12,19 +12,20 @@ app.use(bodyParser.json());
 
 // MySQL connection
 const db = mysql.createConnection({
-  host: 'localhost', // or the host of your MySQL server
-  user: 'root', // your MySQL username
-  password: '@Chris2022', // your MySQL password
-  database: 'dream_team_contributions' // your database name
+  host: 'localhost',
+  user: 'root',
+  password: '@Chris2022',  // Make sure this is the exact password
+  database: 'dream_team_contributions'
 });
+
 
 // Connect to MySQL
 db.connect(err => {
   if (err) {
-    console.error('Error connecting to MySQL: ', err.message);
+    console.error('Error connecting to MySQL: ', err.stack);
     return;
   }
-  console.log('Connected to MySQL database');
+  console.log('Connected to MySQL as id ' + db.threadId);
 });
 
 // Endpoint to add a new contribution
@@ -66,7 +67,7 @@ async function addContribution() {
 
   if (name && amount && month) {
     try {
-      const response = await fetch('http://localhost:3000/add-contribution', {
+      const response = await fetch('https://kyalo-cmd.github.io/dream_team_backend/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -85,7 +86,7 @@ async function addContribution() {
 }
 async function getContributions() {
   try {
-    const response = await fetch('http://localhost:3000/get-contributions');
+    const response = await fetch('https://kyalo-cmd.github.io/dream_team_backend/');
     const contributions = await response.json();
     renderTable(contributions);  // Update the table with live data
   } catch (error) {
